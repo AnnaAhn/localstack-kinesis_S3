@@ -3,6 +3,7 @@ import json
 import base64
 import boto3
 import os
+import uuid
 
 s3 = boto3.client('s3', endpoint_url='http://%s:4566' % os.environ['LOCALSTACK_HOSTNAME'], aws_access_key_id='temp', aws_secret_access_key='temp')
 def lambda_handler(event, context):
@@ -22,7 +23,7 @@ def lambda_handler(event, context):
     lambda_path = '/log/access_log/'
     tmp_path = '/tmp/tmp.json'
     
-    file_name =  temp[0]['time'].split(':')[0].replace('[','').replace('/','_')
+    file_name =  temp[0]['time'].split(':')[0].replace('[','').replace('/','_') +'_'+ str(uuid.uuid1())
     file_name += '.json'
 
     path = temp[0]['time'].split(':')[0].replace('[','').split("/")

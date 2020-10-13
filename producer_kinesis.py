@@ -4,13 +4,13 @@ import subprocess
 import threading
 import queue
 import boto3
-
+import json
 
 class Producer:
     
     def __init__(self, config, filename):
 
-        self.client = boto3.client('kinesis', endpoint_url='http://localhost:4566')
+        self.client = boto3.client('kinesis', endpoint_url=config["endpoint"])
         self.line_queue = queue.Queue(100)
 
         send_thread = threading.Thread(target = self.send_)
@@ -21,18 +21,20 @@ class Producer:
     def poll_file(self,filename):
         f = subprocess.Popen(['tail','-F',filename],\
                 stdout=subprocess.PIPE,stderr=subprocess.PIPE)
-        while True:
-            line = f.stdout.readline()
-            self.line_queue.put(line.rstrip())
-        
+        try:
+            while True:
+                line = f.stdout.readline()
+                self.line_queue.put(line.rstrip())
+        except KeyboardInterrupt:
+            if f:
+                f.terminate()
         
     def send_(self):
         while True:
             cnt_queue = self.line_queue.qsize()
             for i in range(0, cnt_queue):
                 self.put_record(self.line_queue.get())
-            print("---")
-            time.sleep(60)
+            time.sleep(1)
 
 
     def put_record(self, data):
@@ -47,5 +49,7 @@ class Producer:
 
 if __name__ == '__main__':
 
-    conf =  None
-    prod  = Producer(conf, sys.argv[1])
+    conf_file =  sys.argv[1]
+    with open(conf_file) as fin:
+        conf = json.load(fin)
+        prod  = Producer(conf, sys.argv[2])
