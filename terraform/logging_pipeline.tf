@@ -5,7 +5,7 @@ resource "aws_kinesis_stream" "test_stream" {
 
 resource "aws_iam_role" "iam_for_lambda" {
   name               = "iam_for_lambda"
-  assume_role_policy = templatefile("lambda_role.tpl", { region=var.region, account = var.account})
+  assume_role_policy = templatefile("lambda_role.tpl", { region=var.region, account = var.account, function = var.function})
 }
 
 resource "aws_lambda_function" "test_lambda" {

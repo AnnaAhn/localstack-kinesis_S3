@@ -12,7 +12,7 @@
                 "logs:CreateLogStream"
             ],
             "Resource": [
-                "arn:aws:logs:${region}:${account}:log-group:/aws/lambda/processKinesisRecords"
+                "arn:aws:logs:${region}:${account}:log-group:/aws/lambda/${function}"
             ],
             "Effect": "Allow"
         }
